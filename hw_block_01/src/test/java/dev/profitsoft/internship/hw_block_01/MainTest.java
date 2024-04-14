@@ -1,38 +1,24 @@
 package dev.profitsoft.internship.hw_block_01;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-/**
- * Unit test for simple App.
- */
-public class MainTest
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public MainTest(String testName )
-    {
-        super( testName );
-    }
+import java.util.logging.Logger;
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( MainTest.class );
-    }
+class MainTest {
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    private static final String TEST_DATA_DIRECTORY = "src/test/resources";
+    private static final String ATTRIBUTE_NAME = "courses";
+
+    private static final Logger log = Logger.getLogger(MainTest.class.getName());
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 4, 8})
+    void shouldMeasureParsingTimeOnDifferentThreadPollConfigurations(int threadCount) {
+        Main main = new Main();
+        long startTime = System.currentTimeMillis();
+        main.runTask(TEST_DATA_DIRECTORY, ATTRIBUTE_NAME, threadCount);
+        long finishTime = System.currentTimeMillis() - startTime;
+        log.info(String.format("Parsing time with %d thread(s): %d millis", threadCount, finishTime));
     }
 }
