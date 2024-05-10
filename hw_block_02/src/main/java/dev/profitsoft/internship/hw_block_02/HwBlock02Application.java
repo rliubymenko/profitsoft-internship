@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class HwBlock02Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(HwBlock02Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(HwBlock02Application.class, args);
+    }
 
 }
