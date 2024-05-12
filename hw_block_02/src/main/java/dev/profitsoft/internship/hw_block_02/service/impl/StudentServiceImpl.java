@@ -70,6 +70,9 @@ public class StudentServiceImpl implements StudentService {
         if (studentSaveDto.getUsername().isBlank() || studentRepository.existsByUsernameAndIdIsNot(studentSaveDto.getUsername(), id)) {
             throw new DataValidationException("Username must be unique and not null");
         }
+        if (!studentRepository.existsById(id)) {
+            throw new DataValidationException("Must have a valid id");
+        }
 
         Student student = mapToStudent(studentSaveDto, course, id);
         Student savedStudent = studentRepository.save(student);

@@ -39,6 +39,10 @@ public class CourseServiceImpl implements CourseService {
         if (courseRepository.existsByNameAndIdIsNot(courseSaveDto.getName(), id)) {
             throw new DataValidationException("Name must be unique");
         }
+        if (!courseRepository.existsById(id)) {
+            throw new DataValidationException("Must have a valid id");
+        }
+
         Course course = mapToCourse(courseSaveDto, id);
         Course savedCourse = courseRepository.save(course);
         return mapToDetailsDto(savedCourse);
