@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="1715367401770-1" author="rliubymenko">
+        <createTable tableName="course">
+            <column name="id" type="bigint" autoIncrement="true" startWith="21">
+                <constraints primaryKey="true" primaryKeyName="pk_course"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="is_completed" type="boolean"/>
+        </createTable>
+        <createTable tableName="student">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_student"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="first_name" type="varchar(30)"/>
+            <column name="last_name" type="varchar(30)"/>
+            <column name="birth_day" type="date"/>
+
+            <column name="course_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1715514218995-2" author="rliubymenko">
+        <addForeignKeyConstraint baseTableName="student"
+                                 baseColumnNames="course_id"
+                                 constraintName="fk_student_course"
+                                 referencedTableName="course"
+                                 referencedColumnNames="id"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+    <changeSet id="1715510427829-1" author="rliubymenko">
+        <loadData tableName="course" file="db/data/courses.csv">
+            <column name="id" type="bigint"/>
+            <column name="name"/>
+            <column name="description"/>
+            <column name="is_completed"/>
+        </loadData>
+    </changeSet>
+    <changeSet id="1715514218995-1" author="rliubymenko">
+        <createIndex tableName="student" indexName="idx_student_username">
+            <column name="username"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
