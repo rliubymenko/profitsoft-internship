@@ -100,13 +100,14 @@ public class StudentServiceImpl implements StudentService {
                 .withIgnorePaths("course.name", "course.description", "course.isCompleted", "course.students");
 
         Example<Student> example = Example.of(studentProbe, exampleMatcher);
-        PageRequest pageable = PageRequest.of(studentPageable.getPage() - 1, studentPageable.getSize());
+        PageRequest pageable = PageRequest.of(studentPageable.getPage(), studentPageable.getSize());
 
         Page<Student> studentPage = studentRepository.findAll(example, pageable);
 
         List<StudentInfoDto> studentInfoDtos = studentPage.getContent()
                 .stream()
                 .map(student -> StudentInfoDto.builder()
+                        .id(student.getId())
                         .username(student.getUsername())
                         .firstName(student.getFirstName())
                         .lastName(student.getLastName())
@@ -145,12 +146,10 @@ public class StudentServiceImpl implements StudentService {
                     })
                     .stream()
                     .map(studentInfoDto -> {
-                        Optional<Course> maybeCourse = courseRepository.findById(studentInfoDto.getCourseId());
                         boolean isExist = studentRepository.existsByUsername(studentInfoDto.getUsername());
 
-                        if (maybeCourse.isPresent() && !isExist) {
-                            Course course = maybeCourse.get();
-                            return mapToStudent(studentInfoDto, course);
+                        if (!isExist) {
+                            return mapToStudent(studentInfoDto, null);
                         }
                         failureCounter.getAndIncrement();
                         return null;

@@ -9,11 +9,11 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class StudentInfoDto {
 
+    private Long id;
+
     private String username;
 
     private String firstName;
 
     private String lastName;
-
-    private Long courseId;
 }
