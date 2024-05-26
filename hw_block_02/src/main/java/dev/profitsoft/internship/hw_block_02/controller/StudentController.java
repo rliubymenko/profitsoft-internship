@@ -18,6 +18,7 @@ import java.util.Map;
 /**
  * Student controller
  */
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(value = "/api/v1/students")
 public class StudentController {
