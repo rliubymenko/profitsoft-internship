@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  hw_block_05_01:
+    build: .
+    container_name: hw_block_05_01
+    restart: on-failure
+    ports:
+      - "8081:8080"
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+    networks:
+      - hw_05_01_network
+    environment:
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+
+  elasticsearch:
+    image: elasticsearch:8.6.1
+    container_name: elasticsearch_service
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - "xpack.security.enabled=false"
+    ports:
+      - "9200:9200"
+    networks:
+      - hw_05_01_network
+
+  kibana:
+    container_name: kibana_service
+    image: kibana:8.14.0
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - hw_05_01_network
+
+  rabbitmq:
+    image: rabbitmq:3.13-alpine
+    container_name: rabbitmq_service
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit_user
+      RABBITMQ_DEFAULT_PASS: rabbit_password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - hw_05_01_network
+
+networks:
+  hw_05_01_network:

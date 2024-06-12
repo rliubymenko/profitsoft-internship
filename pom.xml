@@ -17,6 +17,7 @@
     <modules>
         <module>hw_block_01</module>
         <module>hw_block_02</module>
+        <module>hw_block_05_01</module>
     </modules>
 
     <build>
