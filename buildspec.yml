@@ -1,30 +1,31 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      docker: 19
-    commands:
-      - echo Installing AWS CLI...
-      - apt-get update -y
-      - apt-get install -y awscli
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 088546496698.dkr.ecr.us-east-1.amazonaws.com
       - REPOSITORY_URI=088546496698.dkr.ecr.us-east-1.amazonaws.com/profitsoft-back
-      - echo Pre-building project...
-      - docker-compose -f ./hw_block_05_01/docker-compose.yml build
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
+      - echo building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest ./hw_block_02
       - echo tagging the Docker image...
-      - docker tag profitsoft-back:latest $REPOSITORY_URI/profitsoft-back:latest
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
-      - echo Pushing the Docker image to the ECR repository...
-      - docker push $REPOSITORY_URI/profitsoft-back:latest
+      - echo pushing Docker image to Amazon ECR started on `date`
+      - echo pushing to repository...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo setting container name...
+      - DOCKER_CONTAINER_NAME=cdicontainer
+      - echo writing image definitions file...
+      - printf '[{"name":"%s","imageUri":"%s"}]' $DOCKER_CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo printing imagedefinitions.json
+      - cat imagedefinitions.json
 
 artifacts:
   files:
-    - docker-compose.yml
-  discard-paths: yes
+    - imagedefinitions.json

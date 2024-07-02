@@ -2,7 +2,6 @@ package dev.profitsoft.internship.hw_block_02.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.profitsoft.internship.hw_block_02.config.RabbitMQConfig;
 import dev.profitsoft.internship.hw_block_02.dto.StudentPage;
 import dev.profitsoft.internship.hw_block_02.dto.StudentPageable;
 import dev.profitsoft.internship.hw_block_02.dto.details.CourseDetailsDto;
@@ -12,13 +11,11 @@ import dev.profitsoft.internship.hw_block_02.dto.save.StudentSaveDto;
 import dev.profitsoft.internship.hw_block_02.entity.Course;
 import dev.profitsoft.internship.hw_block_02.entity.Student;
 import dev.profitsoft.internship.hw_block_02.exception.DataValidationException;
-import dev.profitsoft.internship.hw_block_02.messaging.MailSentMessage;
 import dev.profitsoft.internship.hw_block_02.repository.CourseRepository;
 import dev.profitsoft.internship.hw_block_02.repository.StudentRepository;
 import dev.profitsoft.internship.hw_block_02.service.StudentService;
 import dev.profitsoft.internship.hw_block_02.util.CsvUtil;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -39,14 +36,10 @@ public class StudentServiceImpl implements StudentService {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final ObjectMapper objectMapper;
-    private final RabbitTemplate rabbitTemplate;
 
-    private static final String SUBJECT = "Student creation";
-
-    public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository, RabbitTemplate rabbitTemplate) {
+    public StudentServiceImpl(StudentRepository studentRepository, CourseRepository courseRepository) {
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
-        this.rabbitTemplate = rabbitTemplate;
         objectMapper = new ObjectMapper();
     }
 
@@ -67,26 +60,7 @@ public class StudentServiceImpl implements StudentService {
         Student student = mapToStudent(studentSaveDto, course, null);
         Student savedStudent = studentRepository.save(student);
 
-        StudentDetailsDto studentDetailsDto = mapToDetails(savedStudent);
-        sendEmail(studentDetailsDto);
-        return studentDetailsDto;
-    }
-
-    private void sendEmail(StudentDetailsDto studentDetailsDto) {
-        String content = "Student has been created successfully!\n" +
-                "Student info:\n" +
-                "Username: " + studentDetailsDto.getUsername() + "\n" +
-                "First name: " + studentDetailsDto.getFirstName() + "\n" +
-                "Last name: " + studentDetailsDto.getLastName() + "\n" +
-                "Course: " + studentDetailsDto.getCourse().getName();
-
-        MailSentMessage message = MailSentMessage.builder()
-                .email(studentDetailsDto.getEmail())
-                .subject(SUBJECT)
-                .content(content)
-                .build();
-
-        rabbitTemplate.convertAndSend(RabbitMQConfig.MAIL_SENT_EXCHANGE, "", message);
+        return mapToDetails(savedStudent);
     }
 
     @Override
