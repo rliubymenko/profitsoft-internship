@@ -31,6 +31,10 @@ public class Student {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @NotNull(message = "Email is required")
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
     @Column(name = "first_name", length = 30)
     private String firstName;
 

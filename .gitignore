@@ -4,6 +4,9 @@
 # Log file
 *.log
 
+# Enviroment file
+.env
+
 .jpb/
 
 # BlueJ files

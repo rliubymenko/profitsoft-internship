@@ -48,6 +48,7 @@ class StudentControllerTest {
     void init() {
         studentSaveDto = StudentSaveDto.builder()
                 .username("User name")
+                .email("def@example.com")
                 .firstName("FirstName")
                 .lastName("LastName")
                 .birthDay(LocalDate.of(2001, 1, 1))
