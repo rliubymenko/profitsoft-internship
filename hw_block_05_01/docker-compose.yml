@@ -1,6 +1,41 @@
 version: "3.9"
 
 services:
+  hw_block_05_02:
+    container_name: hw_block_05_02
+    build: ../hw_block_02
+    restart: on-failure
+    env_file: ./.env
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://postgresdb:5432/$POSTGRESDB_DATABASE",
+        "spring.datasource.username" : "$POSTGRESDB_USER",
+        "spring.datasource.password" : "$POSTGRESDB_ROOT_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    networks:
+      - hw_05_01_network
+    depends_on:
+      - postgresdb
+
+  postgresdb:
+    image: postgres
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - POSTGRES_USER=$POSTGRESDB_USER
+      - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+      - POSTGRES_DB=$POSTGRESDB_DATABASE
+    ports:
+      - "5432:5432"
+    networks:
+      - hw_05_01_network
+
   hw_block_05_01:
     build: .
     container_name: hw_block_05_01
@@ -10,6 +45,7 @@ services:
     depends_on:
       - elasticsearch
       - rabbitmq
+      - hw_block_05_02
     networks:
       - hw_05_01_network
     environment:

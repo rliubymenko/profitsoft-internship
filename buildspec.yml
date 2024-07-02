@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 19
+    commands:
+      - echo Installing AWS CLI...
+      - apt-get update -y
+      - apt-get install -y awscli
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 088546496698.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=088546496698.dkr.ecr.us-east-1.amazonaws.com/profitsoft-back
+      - echo Pre-building project...
+      - docker-compose -f ./hw_block_05_01/docker-compose.yml build
+  build:
+    commands:
+      - echo tagging the Docker image...
+      - docker tag profitsoft-back:latest $REPOSITORY_URI/profitsoft-back:latest
+  post_build:
+    commands:
+      - echo Pushing the Docker image to the ECR repository...
+      - docker push $REPOSITORY_URI/profitsoft-back:latest
+
+artifacts:
+  files:
+    - docker-compose.yml
+  discard-paths: yes
