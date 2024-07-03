@@ -5,7 +5,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 088546496698.dkr.ecr.us-east-1.amazonaws.com
-      - REPOSITORY_URI=088546496698.dkr.ecr.us-east-1.amazonaws.com/profitsoft-back
+      - REPOSITORY_URI=088546496698.dkr.ecr.us-east-1.amazonaws.com/prof
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
